@@ -83,8 +83,6 @@ StyleCopReport.xml
 *.pgc
 *.pgd
 *.rsp
-# but not Directory.Build.rsp, as it configures directory-level build defaults
-!Directory.Build.rsp
 *.sbr
 *.tlb
 *.tli
@@ -399,4 +397,30 @@ FodyWeavers.xsd
 
 # JetBrains Rider
 *.sln.iml
+
+# ---> Windows
+# Windows thumbnail cache files
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+
+# Dump file
+*.stackdump
+
+# Folder config file
+[Dd]esktop.ini
+
+# Recycle Bin used on file shares
+$RECYCLE.BIN/
+
+# Windows Installer files
+*.cab
+*.msi
+*.msix
+*.msm
+*.msp
+
+# Windows shortcuts
+*.lnk
 

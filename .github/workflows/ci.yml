@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-test:
+    name: Build & Test
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+          cache: true
+          cache-dependency-path: "**/*.csproj"
+
+      - name: Restore
+        run: dotnet restore GMNotification.sln
+
+      - name: Build
+        run: dotnet build GMNotification.sln --no-restore --configuration Release
+
+      - name: Test
+        run: >
+          dotnet test GMNotification.sln
+          --no-build
+          --configuration Release
+          --collect:"XPlat Code Coverage"
+          --results-directory TestResults
+          --logger "trx;LogFileName=test-results.trx"
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: "TestResults/**/*.trx"
+          if-no-files-found: ignore
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: "TestResults/**/coverage.cobertura.xml"
+          if-no-files-found: ignore

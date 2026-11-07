@@ -1,37 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static GMNotification.Notification;
-
 namespace GMNotification
 {
-    public class Notification
+    /// <summary>
+    /// 通知的数据封装，对应一次「发出的消息」。
+    /// 实例不可变，派发时可安全地在多个回调之间共享。
+    /// </summary>
+    public sealed class Notification
     {
-        public string Name { get;}
-        public object? UserInfo => _UserInfo;
-        private object? _UserInfo { get; set; }
-
-        internal Action<Notification> CallbackAction { get; }
-
-        internal Notification(string name)
+        internal Notification(string name, object? userInfo = null)
         {
-            this.Name = name;
-            this.CallbackAction = a => { };
+            Name = name;
+            UserInfo = userInfo;
         }
 
-        internal Notification(string name, Action<Notification> callbackAction)
-        {
-            this.Name = name;
-            this.CallbackAction = callbackAction;
-        }
+        /// <summary>
+        /// 通知名称，作为派发的标识。
+        /// </summary>
+        public string Name { get; }
 
-        internal void SetUserInfo(object? obj)
-        {
-            _UserInfo = obj;
-        }
+        /// <summary>
+        /// 通知携带的可选负载。
+        /// </summary>
+        public object? UserInfo { get; }
 
+        /// <inheritdoc />
+        public override string ToString()
+            => UserInfo is null ? Name : $"{Name} ({UserInfo})";
     }
-
 }

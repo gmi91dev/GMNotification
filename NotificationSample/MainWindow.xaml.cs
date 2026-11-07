@@ -1,14 +1,8 @@
-﻿using System.Text;
+using System.Collections.Specialized;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using System.Windows.Threading;
 using GMNotification;
+using NotificationSample.ViewModels;
 
 namespace NotificationSample
 {
@@ -17,89 +11,66 @@ namespace NotificationSample
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly MainWindowViewModel _viewModel;
+        private bool _isClosed;
+
         public MainWindow()
         {
             InitializeComponent();
 
-            NotificationCenter.DefaultCenter().AddObserver(this, "resuest.start", noti =>
-            {
-                Update("获取数据中...");
-                
-            });
-
-            NotificationCenter.DefaultCenter().AddObserver(this, "resuest.success", ResuestSuccess);
-
-            NotificationCenter.DefaultCenter().AddObserver(this, "resuest2.success", ResuestSuccess);
-
-            var manager = new HTTPManager();
-
-            NotificationCenter.DefaultCenter().RemoveObserver(this);
-
-            manager.Request();
+            _viewModel = new MainWindowViewModel(NotificationCenter.DefaultCenter(), Dispatcher);
+            DataContext = _viewModel;
+            _viewModel.LogEntries.CollectionChanged += OnLogEntriesChanged;
         }
 
-        private void ResuestSuccess(Notification noti)
+        protected override void OnClosed(EventArgs e)
         {
-            //NotificationCenter.DefaultCenter().RemoveObserver(this, "resuest2.success");
+            _isClosed = true;
+            _viewModel.LogEntries.CollectionChanged -= OnLogEntriesChanged;
+            _viewModel.Dispose();
+            base.OnClosed(e);
+        }
 
-            Dictionary<string, string> dic = noti.UserInfo as Dictionary<string, string>;
-
-            if (dic != null)
+        private void OnLogEntriesChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action != NotifyCollectionChangedAction.Add)
             {
-                var t = $"{noti.Name}: {dic["name"]}， {dic["age"]}";
-                Update(t);
+                return;
             }
-            
+
+            // 延迟到当前集合变更完成后再滚动，避免在 CollectionChanged 中触发布局重入
+            Dispatcher.BeginInvoke(DispatcherPriority.Background, new Action(ScrollToLatestLog));
         }
 
-        private void Update(string text)
+        private void ScrollToLatestLog()
         {
-            Application.Current.Dispatcher.Invoke((Action)delegate ()
+            if (_isClosed || LogList.Items.Count == 0)
             {
-                ContentText.Text = text;
-            });
+                return;
+            }
+
+            LogList.ScrollIntoView(LogList.Items[LogList.Items.Count - 1]);
         }
 
+        private async void OnSuccessRequestClick(object sender, RoutedEventArgs e)
+            => await _viewModel.RunSuccessRequestAsync();
+
+        private async void OnFailureRequestClick(object sender, RoutedEventArgs e)
+            => await _viewModel.RunFailureRequestAsync();
+
+        private async void OnBackgroundRequestClick(object sender, RoutedEventArgs e)
+            => await _viewModel.RunBackgroundRequestAsync();
+
+        private void OnToggleSuccessSubscriptionClick(object sender, RoutedEventArgs e)
+            => _viewModel.ToggleSuccessSubscription();
+
+        private void OnThrowCallbackErrorClick(object sender, RoutedEventArgs e)
+            => _viewModel.TriggerCallbackError();
+
+        private void OnDemoOverrideClick(object sender, RoutedEventArgs e)
+            => _viewModel.TriggerOverrideDemo();
+
+        private void OnClearLogClick(object sender, RoutedEventArgs e)
+            => _viewModel.ClearLog();
     }
-
-    class HTTPManager()
-    {
-        public void Request()
-        {
-            NotificationCenter.DefaultCenter().Post("resuest.start");
-
-            Task task = new Task(GetUserInfo);
-            task.Start();
-
-            Task task2 = new Task(GetUserInfo2);
-            task2.Start();
-        } 
-
-        private void GetUserInfo()
-        {
-
-            Thread.Sleep(5000);
-
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic.Add("name", "张三");
-            dic.Add("age", "28");
-
-            NotificationCenter.DefaultCenter().Post("resuest.success", dic);
-
-        }
-
-        private void GetUserInfo2()
-        {
-
-            Thread.Sleep(15000);
-
-            Dictionary<string, string> dic = new Dictionary<string, string>();
-            dic.Add("name", "李四");
-            dic.Add("age", "20");
-
-            NotificationCenter.DefaultCenter().Post("resuest2.success", dic);
-        }
-
-    }
-
 }

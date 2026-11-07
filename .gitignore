@@ -424,3 +424,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+
+# NuGet package output
+artifacts/
+TestResults/

@@ -1,10 +1,39 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <!-- 核心库不依赖 WPF，目标框架放宽到 net8.0 以便被控制台、Web 等应用复用 -->
+    <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+
+    <!-- NuGet 包元数据 -->
+    <PackageId>GMNotification</PackageId>
+    <Title>GMNotification</Title>
+    <Description>轻量级的 .NET 通知中心，参考 iOS/macOS NSNotificationCenter 设计，支持线程安全派发、类型安全通知名与回调异常隔离。</Description>
+    <Authors>Gmi91</Authors>
+    <Copyright>Copyright (c) 2025 Gmi91</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/gmi91dev/GMNotification</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/gmi91dev/GMNotification.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>notification;notification-center;events;observer;messaging;dotnet;net8</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+
+    <!-- 版本由 release 工作流通过 -p:Version=<tag> 覆盖 -->
+    <VersionPrefix>0.0.1</VersionPrefix>
+
+    <!-- 发布 .snupkg 符号包，便于消费者调试 -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="GMNotification.Tests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
 
 </Project>

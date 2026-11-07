@@ -1,12 +1,67 @@
-﻿<Window x:Class="NotificationSample.MainWindow"
+<Window x:Class="NotificationSample.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:NotificationSample"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        <TextBlock Name="ContentText"/>
+        Title="GMNotification 示例"
+        Height="600" Width="880"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI"
+        Background="#F5F6F8">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="14,8" />
+            <Setter Property="Margin" Value="0,0,8,8" />
+            <Setter Property="MinWidth" Value="150" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <StackPanel Grid.Row="0" Margin="0,0,0,16">
+            <TextBlock Text="GMNotification 示例" FontSize="22" FontWeight="SemiBold" />
+            <TextBlock Margin="0,6,0,0"
+                       Foreground="#5F6368"
+                       TextWrapping="Wrap"
+                       Text="点击按钮触发通知，日志会记录注册、派发和注销的全过程。日志中的线程号可用于观察回调在哪个线程执行。" />
+        </StackPanel>
+
+        <WrapPanel Grid.Row="1">
+            <Button Content="发起请求（成功）" Click="OnSuccessRequestClick" />
+            <Button Content="发起请求（失败）" Click="OnFailureRequestClick" />
+            <Button Content="后台线程发起请求" Click="OnBackgroundRequestClick" />
+            <Button Content="{Binding SuccessSubscriptionButtonText}" Click="OnToggleSuccessSubscriptionClick" />
+            <Button Content="触发回调异常" Click="OnThrowCallbackErrorClick" />
+            <Button Content="演示同名覆盖" Click="OnDemoOverrideClick" />
+            <Button Content="清空日志" Click="OnClearLogClick" />
+        </WrapPanel>
+
+        <Border Grid.Row="2"
+                Margin="0,0,0,12"
+                Padding="12,8"
+                Background="#FFFFFF"
+                BorderBrush="#E0E3E7"
+                BorderThickness="1"
+                CornerRadius="4">
+            <TextBlock Text="{Binding Status}" FontWeight="SemiBold" />
+        </Border>
+
+        <ListBox x:Name="LogList"
+                 Grid.Row="3"
+                 ItemsSource="{Binding LogEntries}"
+                 Background="#FFFFFF"
+                 BorderBrush="#E0E3E7"
+                 FontFamily="Consolas"
+                 FontSize="12"
+                 Padding="4"
+                 ScrollViewer.HorizontalScrollBarVisibility="Auto" />
     </Grid>
 </Window>

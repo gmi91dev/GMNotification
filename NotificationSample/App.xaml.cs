@@ -1,6 +1,5 @@
-﻿using System.Configuration;
-using System.Data;
 using System.Windows;
+using GMNotification;
 
 namespace NotificationSample
 {
@@ -9,6 +8,11 @@ namespace NotificationSample
     /// </summary>
     public partial class App : Application
     {
+        protected override void OnExit(ExitEventArgs e)
+        {
+            NotificationCenter.DefaultCenter().Dispose();
+            base.OnExit(e);
+        }
     }
 
 }

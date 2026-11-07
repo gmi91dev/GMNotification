@@ -35,7 +35,7 @@ dotnet add package GMNotification
 指定版本：
 
 ```bash
-dotnet add package GMNotification --version 0.0.1
+dotnet add package GMNotification --version 0.0.2
 ```
 
 ## 快速开始

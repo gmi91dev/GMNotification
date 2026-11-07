@@ -21,7 +21,7 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
 
     <!-- 版本由 release 工作流通过 -p:Version=<tag> 覆盖 -->
-    <VersionPrefix>0.0.1</VersionPrefix>
+    <VersionPrefix>0.0.2</VersionPrefix>
 
     <!-- 发布 .snupkg 符号包，便于消费者调试 -->
     <IncludeSymbols>true</IncludeSymbols>

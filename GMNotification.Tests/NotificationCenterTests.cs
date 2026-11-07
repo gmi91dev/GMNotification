@@ -85,58 +85,58 @@ public sealed class NotificationCenterTests : NotificationCenterTestBase
     }
 
     [Fact]
-    public void Post_InvokesAllMatchingObservers_WithPayload()
+    public void Post_InvokesAllMatchingObservers_WithData()
     {
         var first = new object();
         var second = new object();
-        object? firstPayload = null;
-        object? secondPayload = null;
+        object? firstData = null;
+        object? secondData = null;
 
-        Center.AddObserver(first, "user.login", n => firstPayload = n.UserInfo);
-        Center.AddObserver(second, "user.login", n => secondPayload = n.UserInfo);
+        Center.AddObserver(first, "user.login", n => firstData = n.UserInfo);
+        Center.AddObserver(second, "user.login", n => secondData = n.UserInfo);
 
-        var payload = new object();
-        Center.Post("user.login", payload);
+        var data = new object();
+        Center.Post("user.login", data);
 
-        Assert.Same(payload, firstPayload);
-        Assert.Same(payload, secondPayload);
+        Assert.Same(data, firstData);
+        Assert.Same(data, secondData);
     }
 
     [Fact]
-    public void Post_NullPayload_DeliversNull()
+    public void Post_NullData_DeliversNull()
     {
         var observer = new object();
-        object? payload = new object();
+        object? data = new object();
 
-        Center.AddObserver(observer, "null.payload", n => payload = n.UserInfo);
-        Center.Post("null.payload");
+        Center.AddObserver(observer, "null.data", n => data = n.UserInfo);
+        Center.Post("null.data");
 
-        Assert.Null(payload);
+        Assert.Null(data);
     }
 
     [Fact]
-    public void Post_ValueTypePayload_DeliversValue()
+    public void Post_ValueTypeData_DeliversValue()
     {
         var observer = new object();
-        object? payload = null;
+        object? data = null;
 
-        Center.AddObserver(observer, "value.payload", n => payload = n.UserInfo);
-        Center.Post("value.payload", 42);
+        Center.AddObserver(observer, "value.data", n => data = n.UserInfo);
+        Center.Post("value.data", 42);
 
-        Assert.Equal(42, Assert.IsType<int>(payload));
+        Assert.Equal(42, Assert.IsType<int>(data));
     }
 
     [Fact]
-    public void Post_ReferencePayload_DeliversSameReference()
+    public void Post_ReferenceData_DeliversSameReference()
     {
         var observer = new object();
-        object? payload = null;
+        object? data = null;
         var expected = new object();
 
-        Center.AddObserver(observer, "reference.payload", n => payload = n.UserInfo);
-        Center.Post("reference.payload", expected);
+        Center.AddObserver(observer, "reference.data", n => data = n.UserInfo);
+        Center.Post("reference.data", expected);
 
-        Assert.Same(expected, payload);
+        Assert.Same(expected, data);
     }
 
     [Fact]

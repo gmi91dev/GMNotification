@@ -21,16 +21,16 @@ namespace NotificationSample.Services
         /// <summary>
         /// 在调用方线程（通常是 UI 线程）派发通知。
         /// </summary>
-        public Task SimulateAsync(NotificationName resultName, object? payload)
-            => SimulateCoreAsync(resultName, payload, useBackgroundThread: false);
+        public Task SimulateAsync(NotificationName resultName, object? data)
+            => SimulateCoreAsync(resultName, data, useBackgroundThread: false);
 
         /// <summary>
         /// 在后台线程派发通知，用于观察回调所在线程。
         /// </summary>
-        public Task SimulateOnBackgroundThreadAsync(NotificationName resultName, object? payload)
-            => SimulateCoreAsync(resultName, payload, useBackgroundThread: true);
+        public Task SimulateOnBackgroundThreadAsync(NotificationName resultName, object? data)
+            => SimulateCoreAsync(resultName, data, useBackgroundThread: true);
 
-        private async Task SimulateCoreAsync(NotificationName resultName, object? payload, bool useBackgroundThread)
+        private async Task SimulateCoreAsync(NotificationName resultName, object? data, bool useBackgroundThread)
         {
             if (useBackgroundThread)
             {
@@ -38,7 +38,7 @@ namespace NotificationSample.Services
                 {
                     _center.Post(NotificationNames.RequestStarted);
                     await Task.Delay(_latency);
-                    _center.Post(resultName, payload);
+                    _center.Post(resultName, data);
                 });
 
                 return;
@@ -46,7 +46,7 @@ namespace NotificationSample.Services
 
             _center.Post(NotificationNames.RequestStarted);
             await Task.Delay(_latency);
-            _center.Post(resultName, payload);
+            _center.Post(resultName, data);
         }
     }
 }

@@ -40,7 +40,7 @@
 - **单例中心**：全局唯一的 `NotificationCenter`，通过 `Lazy<T>`（`ExecutionAndPublication`）保证线程安全的延迟初始化。
 - **基于名称（Name）派发**：发送方通过通知名称标识通知类型，既可使用字符串，也可使用类型安全的 `NotificationName`。
 - **对象 + 通知绑定**：观察者按「宿主对象 + 通知名称」注册，回调在派发线程上执行。
-- **支持负载（UserInfo）**：可附带任意 `object` 作为通知负载，回调接收时使用；`Notification` 不可变，可在多个回调间共享。
+- **支持数据（UserInfo）**：可附带任意 `object` 作为通知数据，回调接收时使用；`Notification` 不可变，可在多个回调间共享。
 - **重复注册覆盖**：同一观察者对同一通知名重复注册时，最后一次注册覆盖前一次，底层使用字典实现 O(1) 查找。
 - **线程安全**：注册、注销、派发均由锁保护；派发在快照上、锁外执行，回调内可安全地再次注册/注销。
 - **异常隔离**：单个回调抛出的异常不会中断其余观察者，可通过 `CallbackError` 事件统一观测。
@@ -80,7 +80,7 @@ GMNotification/
     ├── Infrastructure/
     │   └── UiDispatcher.cs          # 切换回 UI 线程
     ├── Models/
-    │   └── UserPayload.cs           # 成功请求负载
+    │   └── UserData.cs               # 成功请求数据
     ├── Notifications/
     │   └── NotificationNames.cs     # 集中声明的通知名
     ├── Services/
@@ -110,8 +110,8 @@ GMNotification.Tests ─► GMNotification
 | 成员 | 类型 | 说明 |
 | --- | --- | --- |
 | `Name` | `string`（只读） | 通知名称，作为派发的标识 |
-| `UserInfo` | `object?`（只读） | 通知携带的可选负载 |
-| `ToString()` | `string` | 便于调试：无负载时返回名称，否则返回 `名称 (负载)` |
+| `UserInfo` | `object?`（只读） | 通知携带的可选数据 |
+| `ToString()` | `string` | 便于调试：无数据时返回名称，否则返回 `名称 (数据)` |
 
 构造方式（`internal`，仅供库内部使用）：
 
@@ -264,7 +264,8 @@ public static class NotificationNames
 }
 
 NotificationCenter.DefaultCenter().AddObserver(this, NotificationNames.UserLogin, OnUserLogin);
-NotificationCenter.DefaultCenter().Post(NotificationNames.UserLogin, payload);
+var userInfo = new User("Alice");
+NotificationCenter.DefaultCenter().Post(NotificationNames.UserLogin, userInfo);
 NotificationCenter.DefaultCenter().RemoveObserver(this, NotificationNames.UserLogin);
 ```
 
@@ -285,12 +286,12 @@ NotificationCenter.DefaultCenter().RemoveObserver(this, NotificationNames.UserLo
 
 ### 4.1 演示场景
 
-示例用 `NotificationNames` 集中声明 `NotificationName` 类型的通知名，用 `UserPayload` 作为成功请求的强类型负载。
+示例用 `NotificationNames` 集中声明 `NotificationName` 类型的通知名，用 `UserData` 作为成功请求的强类型数据。
 
 | 按钮 | 演示内容 |
 | --- | --- |
-| 发起请求（成功） | UI 线程派发 `request.started`，1 秒后派发 `request.succeeded`，负载为 `UserPayload` |
-| 发起请求（失败） | UI 线程派发 `request.started`，1 秒后派发 `request.failed`，负载为错误字符串 |
+| 发起请求（成功） | UI 线程派发 `request.started`，1 秒后派发 `request.succeeded`，数据为 `UserData` |
+| 发起请求（失败） | UI 线程派发 `request.started`，1 秒后派发 `request.failed`，数据为错误字符串 |
 | 后台线程发起请求 | 在 `Task.Run` 中派发通知，日志里的线程号会变化，用于观察回调线程 |
 | 取消订阅 / 重新订阅 | `RemoveObserver(this, name)` 与 `AddObserver` 的按名称注销/注册 |
 | 触发回调异常 | 一个观察者抛异常，另一个观察者仍能收到通知，并通过 `CallbackError` 记录异常 |
@@ -316,11 +317,11 @@ private void AppendLog(string message)
 ### 4.3 UserInfo 传递
 
 ```csharp
-var payload = new UserPayload("张三", 28);
-NotificationCenter.DefaultCenter().Post(NotificationNames.RequestSucceeded, payload);
+var data = new UserData("张三", 28);
+NotificationCenter.DefaultCenter().Post(NotificationNames.RequestSucceeded, data);
 ```
 
-回调中通过 `notification.UserInfo is UserPayload user` 还原负载，避免使用字符串字典带来的运行时类型错误。
+回调中通过 `notification.UserInfo is UserData user` 还原数据，避免使用字符串字典带来的运行时类型错误。
 
 ---
 
@@ -389,8 +390,8 @@ NotificationCenter.DefaultCenter().AddObserver(this, NotificationNames.UserLogin
 });
 
 // 发送
-var payload = new User { Name = "Alice" };
-NotificationCenter.DefaultCenter().Post(NotificationNames.UserLogin, payload);
+var data = new User { Name = "Alice" };
+NotificationCenter.DefaultCenter().Post(NotificationNames.UserLogin, data);
 
 // 移除（按名称）
 NotificationCenter.DefaultCenter().RemoveObserver(this, NotificationNames.UserLogin);
@@ -406,7 +407,7 @@ NotificationCenter.DefaultCenter().RemoveAllObservers();
 
 ```csharp
 NotificationCenter.DefaultCenter().AddObserver(this, "user.login", OnUserLogin);
-NotificationCenter.DefaultCenter().Post("user.login", payload);
+NotificationCenter.DefaultCenter().Post("user.login", new User { Name = "Alice" });
 ```
 
 ### 6.2 在 WPF 中跨线程安全更新

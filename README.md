@@ -1,6 +1,7 @@
 # GMNotification
 
 [![.NET](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
+[![NuGet](https://img.shields.io/nuget/v/GMNotification.svg)](https://www.nuget.org/packages/GMNotification)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/gmi91dev/GMNotification/blob/main/LICENSE)
 
 一个面向 .NET 8 的轻量级通知中心（Notification Center），参考 iOS/macOS `NSNotificationCenter` 的设计。核心库不依赖 WPF，可在控制台、WPF、WinForms、ASP.NET Core 等任意 .NET 8 应用中复用。
@@ -10,7 +11,7 @@
 - **单例通知中心**：`NotificationCenter.DefaultCenter()` 提供全局统一入口
 - **按名称派发**：支持字符串通知名和类型安全的 `NotificationName`
 - **对象 + 通知绑定**：按「观察者对象 + 通知名称」注册与注销
-- **任意负载**：`Notification.UserInfo` 可携带任意 `object`
+- **任意数据**：`Notification.UserInfo` 可携带任意 `object`
 - **同名覆盖**：同一观察者对同名通知重复注册时，最后一次注册生效
 - **线程安全**：注册、注销、派发均可从任意线程调用
 - **异常隔离**：单个回调抛异常不会中断其他观察者
@@ -25,16 +26,16 @@
 
 ## 安装
 
-仓库目前尚未发布到 nuget.org。发布后可以直接安装：
+已发布到 nuget.org：
 
 ```bash
 dotnet add package GMNotification
 ```
 
-在此之前，可通过项目引用使用：
+指定版本：
 
 ```bash
-dotnet add YourProject.csproj reference path/to/GMNotification/GMNotification.csproj
+dotnet add package GMNotification --version 0.0.1
 ```
 
 ## 快速开始
@@ -55,7 +56,8 @@ public static class NotificationNames
 `NotificationName` 是 `readonly struct`，可与 `string` 隐式互转，因此也可以直接使用字符串：
 
 ```csharp
-NotificationCenter.DefaultCenter().Post("user.login", payload);
+var userInfo = new User("Alice");
+NotificationCenter.DefaultCenter().Post("user.login", userInfo);
 ```
 
 ### 2. 注册、派发与注销
@@ -126,8 +128,8 @@ NotificationCenter.DefaultCenter().RemoveAllObservers();
 | 成员 | 类型 | 说明 |
 | --- | --- | --- |
 | `Name` | `string` | 通知名称 |
-| `UserInfo` | `object?` | 通知负载 |
-| `ToString()` | `string` | 无负载返回名称，有负载返回 `名称 (负载)` |
+| `UserInfo` | `object?` | 通知数据 |
+| `ToString()` | `string` | 无数据返回名称，有数据返回 `名称 (数据)` |
 
 ### `NotificationErrorEventArgs`
 

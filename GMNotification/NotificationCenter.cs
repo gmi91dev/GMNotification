@@ -68,7 +68,7 @@ namespace GMNotification
         /// 发送通知。回调在调用 <see cref="Post(string, object?)"/> 的线程上执行。
         /// </summary>
         /// <param name="name">通知名称。</param>
-        /// <param name="userInfo">可选的负载对象。</param>
+        /// <param name="userInfo">可选的数据对象。</param>
         /// <exception cref="ArgumentException"><paramref name="name"/> 为 <see langword="null"/> 或空字符串。</exception>
         public void Post(string name, object? userInfo = null)
         {

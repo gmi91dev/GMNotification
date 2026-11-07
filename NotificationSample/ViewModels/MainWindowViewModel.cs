@@ -60,7 +60,7 @@ namespace NotificationSample.ViewModels
         public async Task RunSuccessRequestAsync()
         {
             AppendLog($"在 UI 线程发起请求，稍后派发 {NotificationNames.RequestSucceeded}");
-            await _requestService.SimulateAsync(NotificationNames.RequestSucceeded, new UserPayload("张三", 28));
+            await _requestService.SimulateAsync(NotificationNames.RequestSucceeded, new UserData("张三", 28));
         }
 
         public async Task RunFailureRequestAsync()
@@ -126,20 +126,20 @@ namespace NotificationSample.ViewModels
 
         private void OnRequestSucceeded(Notification notification)
         {
-            if (notification.UserInfo is UserPayload user)
+            if (notification.UserInfo is UserData user)
             {
-                AppendLog($"收到 {notification.Name}，负载：{user.Name} / {user.Age} 岁");
+                AppendLog($"收到 {notification.Name}，数据：{user.Name} / {user.Age} 岁");
                 SetStatus($"请求成功：{user.Name}");
                 return;
             }
 
-            AppendLog($"收到 {notification.Name}，但负载类型不匹配");
+            AppendLog($"收到 {notification.Name}，但数据类型不匹配");
         }
 
         private void OnRequestFailed(Notification notification)
         {
             string reason = notification.UserInfo as string ?? "未知错误";
-            AppendLog($"收到 {notification.Name}，负载：{reason}");
+            AppendLog($"收到 {notification.Name}，数据：{reason}");
             SetStatus($"请求失败：{reason}");
         }
 

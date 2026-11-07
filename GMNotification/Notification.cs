@@ -18,7 +18,7 @@ namespace GMNotification
         public string Name { get; }
 
         /// <summary>
-        /// 通知携带的可选负载。
+        /// 通知携带的可选数据。
         /// </summary>
         public object? UserInfo { get; }
 

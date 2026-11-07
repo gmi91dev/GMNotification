@@ -12,17 +12,17 @@ public sealed class NotificationTests : NotificationCenterTestBase
     }
 
     [Fact]
-    public void Constructor_WithPayload_ExposesSameReference()
+    public void Constructor_WithData_ExposesSameReference()
     {
-        var payload = new object();
-        var notification = new Notification("user.login", payload);
+        var data = new object();
+        var notification = new Notification("user.login", data);
 
         Assert.Equal("user.login", notification.Name);
-        Assert.Same(payload, notification.UserInfo);
+        Assert.Same(data, notification.UserInfo);
     }
 
     [Fact]
-    public void ToString_ReturnsNameWhenNoPayload()
+    public void ToString_ReturnsNameWhenNoData()
     {
         var notification = new Notification("plain");
 
@@ -30,11 +30,11 @@ public sealed class NotificationTests : NotificationCenterTestBase
     }
 
     [Fact]
-    public void ToString_IncludesPayloadWhenPresent()
+    public void ToString_IncludesDataWhenPresent()
     {
-        var notification = new Notification("with.payload", new DisplayText("Alice"));
+        var notification = new Notification("with.data", new DisplayText("Alice"));
 
-        Assert.Equal("with.payload (Alice)", notification.ToString());
+        Assert.Equal("with.data (Alice)", notification.ToString());
     }
 
     [Fact]
